@@ -4,6 +4,11 @@ services:
     image: "mysql:latest"
     container_name: "database"
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: password1
+      MYSQL_DATABASE: db
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "3006:3006"
+      - "3306:3306"
+    volumes:
+      - "./docker/dbInit:/docker-entrypoint-initdb.d"

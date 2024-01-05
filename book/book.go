@@ -3,8 +3,8 @@ package book
 import "time"
 
 type Book struct {
-	ID string
-	Name string
+	ID int64
+	Title string
 	Author string
 	CreationTime time.Time
 }

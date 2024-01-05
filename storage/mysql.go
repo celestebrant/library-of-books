@@ -1,8 +1,10 @@
 package storage
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/celestebrant/docker-sql-demo/book"
 	_ "github.com/go-sql-driver/mysql" // blank import runs init
@@ -27,6 +29,11 @@ func NewMysqlStorage(conf MysqlConfig) (MysqlStorage, error) {
 	db, err := sql.Open("mysql", dsn)
 
 	if err != nil {
+		return MysqlStorage{}, fmt.Errorf("cannot validate open SQL connection arguments: %w", err)
+	}
+
+	err = db.Ping()
+	if err != nil {
 		return MysqlStorage{}, fmt.Errorf("cannot open SQL connection: %w", err)
 	}
 
@@ -35,8 +42,25 @@ func NewMysqlStorage(conf MysqlConfig) (MysqlStorage, error) {
 	}, nil
 }
 
-// Create creates a record of a book in the Mysql storage.
-func (s *MysqlStorage) Create(b book.Book) error {
-	
-	return nil
+// CreateBook creates a record of a book in the Mysql storage.
+func (s *MysqlStorage) CreateBook(ctx context.Context, b *book.Book) (*book.Book, error) {
+	query := "INSERT INTO `books` (`creation_time`, `title`, `author`) VALUES (?, ?, ?);"
+
+	if b.CreationTime.IsZero() {
+		b.CreationTime = time.Now()
+	}
+
+	result, err := s.db.ExecContext(ctx, query, b.CreationTime, b.Title, b.Author)
+	if err != nil {
+		return &book.Book{}, fmt.Errorf("error during insert: %w", err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return &book.Book{}, fmt.Errorf("cannot get last insert id: %w", err)
+	}
+
+	b.ID = id
+
+	return b, nil
 }
