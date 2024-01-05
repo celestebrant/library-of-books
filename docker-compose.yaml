@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+  database:
+    image: "mysql:latest"
+    container_name: "database"
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - "3006:3006"
