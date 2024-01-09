@@ -8,6 +8,7 @@ import (
 
 	"github.com/celestebrant/docker-sql-demo/book"
 	_ "github.com/go-sql-driver/mysql" // blank import runs init
+	"github.com/oklog/ulid/v2"
 )
 
 type MysqlStorage struct {
@@ -42,25 +43,27 @@ func NewMysqlStorage(conf MysqlConfig) (MysqlStorage, error) {
 	}, nil
 }
 
-// CreateBook creates a record of a book in the Mysql storage.
+// CreateBook creates a record of a book in the Mysql storage. If book creation time has a zero value,
+// then it will be set to now. If the book ID is empty, then it will take on a generated ULID string.
 func (s *MysqlStorage) CreateBook(ctx context.Context, b *book.Book) (*book.Book, error) {
-	query := "INSERT INTO `books` (`creation_time`, `title`, `author`) VALUES (?, ?, ?);"
+	query := "INSERT INTO `books` (`id`, `creation_time`, `title`, `author`) VALUES (?, ?, ?, ?);"
 
 	if b.CreationTime.IsZero() {
 		b.CreationTime = time.Now()
 	}
+	if b.ID == "" {
+		b.ID = ulid.Make().String()
+	}
 
-	result, err := s.db.ExecContext(ctx, query, b.CreationTime, b.Title, b.Author)
+	err := b.Validate()
+	if err != nil {
+		return nil, fmt.Errorf("cannot insert book: %w", err)
+	}
+
+	_, err = s.db.ExecContext(ctx, query, b.ID, b.CreationTime, b.Title, b.Author)
 	if err != nil {
 		return &book.Book{}, fmt.Errorf("error during insert: %w", err)
 	}
-
-	id, err := result.LastInsertId()
-	if err != nil {
-		return &book.Book{}, fmt.Errorf("cannot get last insert id: %w", err)
-	}
-
-	b.ID = id
 
 	return b, nil
 }

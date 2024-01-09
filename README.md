@@ -21,3 +21,6 @@ Other database commands
 * Show tables with `SHOW DATABASES;`
 * Change database with `USE <database name>;`, e.g. `USE db;`.
 * Show tables with `SHOW TABLES;`. If you don't see the tables you expected, perhaps the program cannot find your volume.
+
+Run tests:
+* `go test ./book`
