@@ -1,6 +1,6 @@
 # Library of Books
 
-This project a representation of a back-end application for a library, for demo purposes. It contains an initialisation of a MySQL database into a docker container.
+This project is a representation of a back-end application for a library, for demo purposes. It contains an initialisation of a MySQL database into a docker container.
 
 Currently, it is possible to:
 * Register a book to the library
