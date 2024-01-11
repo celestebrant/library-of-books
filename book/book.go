@@ -11,38 +11,7 @@ type Book struct {
 	CreationTime time.Time
 }
 
-type InvalidAuthorError struct {
-	Message string
-}
-
-func (e *InvalidAuthorError) Error() string {
-	return e.Message
-}
-
-type InvalidTitleError struct {
-	Message string
-}
-
-func (e *InvalidTitleError) Error() string {
-	return e.Message
-}
-
-type InvalidIDError struct {
-	Message string
-}
-
-func (e *InvalidIDError) Error() string {
-	return e.Message
-}
-
-type InvalidCreationTimeError struct {
-	Message string
-}
-
-func (e *InvalidCreationTimeError) Error() string {
-	return e.Message
-}
-
+// validateAuthor returns an error if author exceeds 255 characters or is empty.
 func (b *Book) validateAuthor() error {
 	if len(b.Author) > 255 {
 		return &InvalidAuthorError{"author exceeds 255 characters"}
@@ -53,6 +22,7 @@ func (b *Book) validateAuthor() error {
 	return nil
 }
 
+// validateTitle returns an error if title exceeds 255 characters or is empty.
 func (b *Book) validateTitle() error {
 	if len(b.Title) > 255 {
 		return &InvalidTitleError{"title exceeds 255 characters"}
@@ -63,6 +33,7 @@ func (b *Book) validateTitle() error {
 	return nil
 }
 
+// validateID returns an error if ID exceeds 255 characters or is empty.
 func (b *Book) validateID() error {
 	if len(b.ID) > 26 {
 		return &InvalidIDError{"id exceeds 255 characters"}
@@ -73,6 +44,7 @@ func (b *Book) validateID() error {
 	return nil
 }
 
+// validateCreationTime returns an error if creation time has a zero-value.
 func (b *Book) validateCreationTime() error {
 	if b.CreationTime.IsZero() {
 		return &InvalidCreationTimeError{"creation time has zero value"}
@@ -80,9 +52,7 @@ func (b *Book) validateCreationTime() error {
 	return nil
 }
 
-// Validate validates ID, author and title of a Book. Returns an error if fields
-// author, title, or ID are empty or exceed their max length. Returns an error if
-// creation time has zero-value.
+// Validate validates ID, author, title, and creation timestamp of a Book.
 func (b *Book) Validate() error {
 	err := b.validateAuthor()
 	if err != nil {

@@ -1,4 +1,4 @@
-module github.com/celestebrant/docker-sql-demo
+module github.com/celestebrant/library-of-books
 
 go 1.21.5
 

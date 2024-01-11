@@ -1,6 +1,16 @@
-# Docker-SQL demo
+# Library of Books
 
-This project is for practicing the creation of a MySQL database in a docker container in Golang.
+This project is a back-end application for a library. It contains an initialisation of a MySQL database into a docker container.
+
+It is possible to:
+* Register a book to the library
+
+This project is not yet complete and the following features shall be added in due course:
+* Ability for a customer to take out a book
+* Ability for a customer to return a book
+* Alert customers if the book due date has been reached
+* Charge customers a fee for overdue books
+* Ban customers from taking out books
 
 Instructions
 1. Ensure the docker engine is running on your machine. In Mac, open the Docker application.

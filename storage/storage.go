@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"github.com/celestebrant/docker-sql-demo/book"
+	"github.com/celestebrant/library-of-books/book"
 )
 
 type Storage interface {

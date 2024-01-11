@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/celestebrant/docker-sql-demo/book"
-	storage "github.com/celestebrant/docker-sql-demo/storage"
+	"github.com/celestebrant/library-of-books/book"
+	storage "github.com/celestebrant/library-of-books/storage"
 )
 
 func main() {
