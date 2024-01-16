@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
+	validate_book "github.com/celestebrant/library-of-books/book"
 	books "github.com/celestebrant/library-of-books/books"
 	"google.golang.org/grpc"
 )
@@ -16,10 +18,15 @@ type booksServer struct {
 func (s *booksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
-	// Idempotency check
+	// TODO: Idempotency check
+
 	// Validate book
-	// book := req.Book.Validate()
-	res := &books.CreateBookResponse{}
+	err := validate_book.Validate(req.Book)
+	if err != nil {
+		return nil, fmt.Errorf("validation error: %w", err)
+	}
+
+	res := &books.CreateBookResponse{Book: req.Book}
 	return res, nil
 }
 

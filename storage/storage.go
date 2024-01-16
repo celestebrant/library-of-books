@@ -3,9 +3,9 @@ package storage
 import (
 	"context"
 
-	"github.com/celestebrant/library-of-books/book"
+	books "github.com/celestebrant/library-of-books/books"
 )
 
 type Storage interface {
-	CreateBook(context.Context, *book.Book) (*book.Book, error)
+	CreateBook(context.Context, *books.Book) (*books.Book, error)
 }

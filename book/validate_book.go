@@ -2,6 +2,8 @@ package book
 
 import (
 	"time"
+
+	books "github.com/celestebrant/library-of-books/books"
 )
 
 type Book struct {
@@ -12,7 +14,7 @@ type Book struct {
 }
 
 // validateAuthor returns an error if author exceeds 255 characters or is empty.
-func (b *Book) validateAuthor() error {
+func validateAuthor(b *books.Book) error {
 	if len(b.Author) > 255 {
 		return &InvalidAuthorError{"author exceeds 255 characters"}
 	}
@@ -23,7 +25,7 @@ func (b *Book) validateAuthor() error {
 }
 
 // validateTitle returns an error if title exceeds 255 characters or is empty.
-func (b *Book) validateTitle() error {
+func validateTitle(b *books.Book) error {
 	if len(b.Title) > 255 {
 		return &InvalidTitleError{"title exceeds 255 characters"}
 	}
@@ -34,7 +36,7 @@ func (b *Book) validateTitle() error {
 }
 
 // validateID returns an error if ID exceeds 255 characters or is empty.
-func (b *Book) validateID() error {
+func validateID(b *books.Book) error {
 	if len(b.Id) > 26 {
 		return &InvalidIDError{"id exceeds 255 characters"}
 	}
@@ -45,31 +47,32 @@ func (b *Book) validateID() error {
 }
 
 // validateCreationTime returns an error if creation time has a zero-value.
-func (b *Book) validateCreationTime() error {
-	if b.CreationTime.IsZero() {
+func validateCreationTime(b *books.Book) error {
+	time := b.CreationTime.AsTime()
+	if time.IsZero() {
 		return &InvalidCreationTimeError{"creation time has zero value"}
 	}
 	return nil
 }
 
 // Validate validates ID, author, title, and creation timestamp of a Book.
-func (b *Book) Validate() error {
-	err := b.validateAuthor()
+func Validate(b *books.Book) error {
+	err := validateAuthor(b)
 	if err != nil {
 		return err
 	}
 
-	err = b.validateTitle()
+	err = validateTitle(b)
 	if err != nil {
 		return err
 	}
 
-	err = b.validateID()
+	err = validateID(b)
 	if err != nil {
 		return err
 	}
 
-	err = b.validateCreationTime()
+	err = validateCreationTime(b)
 	if err != nil {
 		return err
 	}

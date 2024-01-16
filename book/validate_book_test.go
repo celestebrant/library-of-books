@@ -5,8 +5,10 @@ import (
 	"testing"
 	"time"
 
+	books "github.com/celestebrant/library-of-books/books"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestValidateAuthor(t *testing.T) {
@@ -17,10 +19,10 @@ func TestValidateAuthor(t *testing.T) {
 		author := `author with 255 characters: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 		r.Len(author, 255)
 
-		book := Book{
+		book := &books.Book{
 			Author: author,
 		}
-		err := book.validateAuthor()
+		err := validateAuthor(book)
 		r.NoError(err)
 	})
 
@@ -29,20 +31,20 @@ func TestValidateAuthor(t *testing.T) {
 		author := `author with 256 characters: baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 		r.Len(author, 256)
 
-		book := Book{
+		book := &books.Book{
 			Author: author,
 		}
-		err := book.validateAuthor()
+		err := validateAuthor(book)
 		var invalidAuthorError *InvalidAuthorError
 		r.ErrorAs(err, &invalidAuthorError)
 	})
 
 	t.Run("empty returns error", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Author: ``,
 		}
-		err := book.validateAuthor()
+		err := validateAuthor(book)
 		var invalidAuthorError *InvalidAuthorError
 		r.ErrorAs(err, &invalidAuthorError)
 	})
@@ -56,10 +58,10 @@ func TestValidateTitle(t *testing.T) {
 		title := `title with 255 characters: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 		r.Len(title, 255)
 
-		book := Book{
+		book := &books.Book{
 			Title: title,
 		}
-		err := book.validateTitle()
+		err := validateTitle(book)
 		r.NoError(err)
 	})
 
@@ -68,20 +70,20 @@ func TestValidateTitle(t *testing.T) {
 		title := `title with 256 characters: baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 		r.Len(title, 256)
 
-		book := Book{
+		book := &books.Book{
 			Title: title,
 		}
-		err := book.validateTitle()
+		err := validateTitle(book)
 		var invalidTitleError *InvalidTitleError
 		r.ErrorAs(err, &invalidTitleError)
 	})
 
 	t.Run("empty returns error", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Title: ``,
 		}
-		err := book.validateTitle()
+		err := validateTitle(book)
 		var invalidTitleError *InvalidTitleError
 		r.ErrorAs(err, &invalidTitleError)
 	})
@@ -90,29 +92,29 @@ func TestValidateTitle(t *testing.T) {
 func TestValidateID(t *testing.T) {
 	t.Run("max length", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Id: ulid.Make().String(),
 		}
-		err := book.validateID()
+		err := validateID(book)
 		r.NoError(err)
 	})
 
 	t.Run("max length + 1 returns error", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Id: fmt.Sprint(ulid.Make().String(), "a"),
 		}
-		err := book.validateID()
+		err := validateID(book)
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
 	})
 
 	t.Run("empty returns error", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Id: ``,
 		}
-		err := book.validateID()
+		err := validateID(book)
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
 	})
@@ -121,20 +123,19 @@ func TestValidateID(t *testing.T) {
 func TestValidateCreationTime(t *testing.T) {
 	t.Run("now", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
-			CreationTime: time.Now(),
+		book := &books.Book{
+			CreationTime: timestamppb.New(time.Now()),
 		}
-		err := book.validateCreationTime()
+		err := validateCreationTime(book)
 		r.NoError(err)
 	})
 
 	t.Run("zero value returns error", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
-			CreationTime: time.Time{},
+		book := &books.Book{
+			CreationTime: timestamppb.New(time.Time{}),
 		}
-
-		err := book.validateCreationTime()
+		err := validateCreationTime(book)
 		var invalidCreationTimeError *InvalidCreationTimeError
 		r.ErrorAs(err, &invalidCreationTimeError)
 	})
@@ -143,68 +144,68 @@ func TestValidateCreationTime(t *testing.T) {
 func TestValidate(t *testing.T) {
 	t.Run("positive returns no error", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Author:       `author1`,
 			Title:        `title1`,
 			Id:           ulid.Make().String(),
-			CreationTime: time.Now(),
+			CreationTime: timestamppb.New(time.Now()),
 		}
-		err := book.Validate()
+		err := Validate(book)
 		r.NoError(err)
 	})
 
 	t.Run("validates author", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Author:       ``,
 			Title:        `title1`,
 			Id:           ulid.Make().String(),
-			CreationTime: time.Now(),
+			CreationTime: timestamppb.New(time.Now()),
 		}
 
-		err := book.Validate()
+		err := Validate(book)
 		var invalidAuthorError *InvalidAuthorError
 		r.ErrorAs(err, &invalidAuthorError)
 	})
 
 	t.Run("validates title", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Author:       `author1`,
 			Title:        ``,
 			Id:           ulid.Make().String(),
-			CreationTime: time.Now(),
+			CreationTime: timestamppb.New(time.Now()),
 		}
 
-		err := book.Validate()
+		err := Validate(book)
 		var invalidTitleError *InvalidTitleError
 		r.ErrorAs(err, &invalidTitleError)
 	})
 
 	t.Run("validates ID", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Author:       `author1`,
 			Title:        `title1`,
 			Id:           ``,
-			CreationTime: time.Now(),
+			CreationTime: timestamppb.New(time.Now()),
 		}
 
-		err := book.Validate()
+		err := Validate(book)
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
 	})
 
 	t.Run("validates creation time", func(t *testing.T) {
 		r := require.New(t)
-		book := Book{
+		book := &books.Book{
 			Author:       `author1`,
 			Title:        `title1`,
 			Id:           ulid.Make().String(),
-			CreationTime: time.Time{},
+			CreationTime: timestamppb.New(time.Time{}),
 		}
 
-		err := book.Validate()
+		err := Validate(book)
 		var invalidCreationTimeError *InvalidCreationTimeError
 		r.ErrorAs(err, &invalidCreationTimeError)
 	})

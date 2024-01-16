@@ -5,7 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/celestebrant/library-of-books/book"
+	books "github.com/celestebrant/library-of-books/books"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	storage "github.com/celestebrant/library-of-books/storage"
 )
 
@@ -19,13 +21,13 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("failed to create mysql storage: %v", err)
+		log.Fatalf("failed to create MySQL storage: %v", err)
 	}
 
-	log.Printf("mysql database store created: %v", store)
+	log.Printf("MySQL database store created: %v", store)
 
-	b, err := store.CreateBook(context.Background(), &book.Book{
-		CreationTime: time.Now(),
+	b, err := store.CreateBook(context.Background(), &books.Book{
+		CreationTime: timestamppb.New(time.Now()),
 		Title:        "title1",
 		Author:       "author1",
 	})
