@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	validate_book "github.com/celestebrant/library-of-books/book"
 	books "github.com/celestebrant/library-of-books/books"
+	validate_book "github.com/celestebrant/library-of-books/validate_book"
 	"github.com/oklog/ulid/v2"
 )
 

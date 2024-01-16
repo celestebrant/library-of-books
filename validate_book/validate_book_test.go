@@ -1,4 +1,4 @@
-package book
+package validate_book
 
 import (
 	"fmt"

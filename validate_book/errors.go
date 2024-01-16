@@ -1,4 +1,4 @@
-package book
+package validate_book
 
 type InvalidAuthorError struct {
 	Message string

@@ -6,8 +6,8 @@ import (
 	"log"
 	"net"
 
-	validate_book "github.com/celestebrant/library-of-books/book"
 	books "github.com/celestebrant/library-of-books/books"
+	validate_book "github.com/celestebrant/library-of-books/validate_book"
 	"google.golang.org/grpc"
 )
 
