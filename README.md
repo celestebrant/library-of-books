@@ -73,7 +73,7 @@ This project is not yet complete and the following features shall be added in du
 While this is not recommended for real-life use, it may be useful for exploratory or debugging purposes.
 
 #### Write demo
-A demo exists in `main.go` which creates a connection to the database and adds a book (writes a record to table `book`). You can run this with `go run main.go`.
+A demo exists which creates a connection to the database and adds a book (writes a record to table `book`). You can run this with `go run ./db_write_demo`.
 
 #### Connecting to the database via terminal
 A demo username and password (`user1` and `password1`) is defined in `./docker-compose.yaml` intended for demo purposes only.
