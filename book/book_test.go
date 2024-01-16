@@ -91,7 +91,7 @@ func TestValidateID(t *testing.T) {
 	t.Run("max length", func(t *testing.T) {
 		r := require.New(t)
 		book := Book{
-			ID: ulid.Make().String(),
+			Id: ulid.Make().String(),
 		}
 		err := book.validateID()
 		r.NoError(err)
@@ -100,7 +100,7 @@ func TestValidateID(t *testing.T) {
 	t.Run("max length + 1 returns error", func(t *testing.T) {
 		r := require.New(t)
 		book := Book{
-			ID: fmt.Sprint(ulid.Make().String(), "a"),
+			Id: fmt.Sprint(ulid.Make().String(), "a"),
 		}
 		err := book.validateID()
 		var invalidIDError *InvalidIDError
@@ -110,7 +110,7 @@ func TestValidateID(t *testing.T) {
 	t.Run("empty returns error", func(t *testing.T) {
 		r := require.New(t)
 		book := Book{
-			ID: ``,
+			Id: ``,
 		}
 		err := book.validateID()
 		var invalidIDError *InvalidIDError
@@ -146,7 +146,7 @@ func TestValidate(t *testing.T) {
 		book := Book{
 			Author:       `author1`,
 			Title:        `title1`,
-			ID:           ulid.Make().String(),
+			Id:           ulid.Make().String(),
 			CreationTime: time.Now(),
 		}
 		err := book.Validate()
@@ -158,7 +158,7 @@ func TestValidate(t *testing.T) {
 		book := Book{
 			Author:       ``,
 			Title:        `title1`,
-			ID:           ulid.Make().String(),
+			Id:           ulid.Make().String(),
 			CreationTime: time.Now(),
 		}
 
@@ -172,7 +172,7 @@ func TestValidate(t *testing.T) {
 		book := Book{
 			Author:       `author1`,
 			Title:        ``,
-			ID:           ulid.Make().String(),
+			Id:           ulid.Make().String(),
 			CreationTime: time.Now(),
 		}
 
@@ -186,7 +186,7 @@ func TestValidate(t *testing.T) {
 		book := Book{
 			Author:       `author1`,
 			Title:        `title1`,
-			ID:           ``,
+			Id:           ``,
 			CreationTime: time.Now(),
 		}
 
@@ -200,7 +200,7 @@ func TestValidate(t *testing.T) {
 		book := Book{
 			Author:       `author1`,
 			Title:        `title1`,
-			ID:           ulid.Make().String(),
+			Id:           ulid.Make().String(),
 			CreationTime: time.Time{},
 		}
 

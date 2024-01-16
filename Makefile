@@ -4,4 +4,4 @@ generate_grpc_code:
         --go_opt=paths=source_relative \
         --go-grpc_out=. \
         --go-grpc_opt=paths=source_relative \
-        ./proto/books.proto
+        ./books/books.proto

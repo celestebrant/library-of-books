@@ -17,8 +17,8 @@ func (s *MysqlStorage) CreateBook(ctx context.Context, b *book.Book) (*book.Book
 	if b.CreationTime.IsZero() {
 		b.CreationTime = time.Now()
 	}
-	if b.ID == "" {
-		b.ID = ulid.Make().String()
+	if b.Id == "" {
+		b.Id = ulid.Make().String()
 	}
 
 	err := b.Validate()
@@ -26,7 +26,7 @@ func (s *MysqlStorage) CreateBook(ctx context.Context, b *book.Book) (*book.Book
 		return nil, fmt.Errorf("cannot insert book: %w", err)
 	}
 
-	_, err = s.db.ExecContext(ctx, query, b.ID, b.CreationTime, b.Title, b.Author)
+	_, err = s.db.ExecContext(ctx, query, b.Id, b.CreationTime, b.Title, b.Author)
 	if err != nil {
 		return &book.Book{}, fmt.Errorf("error during insert: %w", err)
 	}

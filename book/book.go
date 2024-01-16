@@ -5,7 +5,7 @@ import (
 )
 
 type Book struct {
-	ID           string
+	Id           string
 	Title        string
 	Author       string
 	CreationTime time.Time
@@ -35,10 +35,10 @@ func (b *Book) validateTitle() error {
 
 // validateID returns an error if ID exceeds 255 characters or is empty.
 func (b *Book) validateID() error {
-	if len(b.ID) > 26 {
+	if len(b.Id) > 26 {
 		return &InvalidIDError{"id exceeds 255 characters"}
 	}
-	if len(b.ID) == 0 {
+	if len(b.Id) == 0 {
 		return &InvalidIDError{"id is empty"}
 	}
 	return nil
