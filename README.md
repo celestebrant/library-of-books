@@ -54,7 +54,7 @@ It is currently only possible to set up the `Books` gRPC server locally.
 
 Instructions:
 1. Ensure the latest Go-generated proto files exist by running `make generate_grpc_code`. Not working? Try running the `protoc` command which you can find inside that file, and ensure your GOPATH is correct.
-1. Run `go run ./server`
+1. Run `go run ./cmd/server`
 1. You are now ready to make calls.
 
 ## Using the deployed application
