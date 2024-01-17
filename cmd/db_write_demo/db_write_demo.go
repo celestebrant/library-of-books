@@ -15,7 +15,7 @@ func main() {
 	store, err := storage.NewMysqlStorage(storage.MysqlConfig{
 		Username: "user1",
 		Password: "password1",
-		DBName:   "db",
+		DBName:   "library",
 		Port:     3306,
 		Host:     "localhost", // this code will execute in machine, not container
 	})

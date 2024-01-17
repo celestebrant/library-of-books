@@ -1,4 +1,5 @@
-version: "3.3"
+version: "3.8"
+
 services:
   database:
     image: "mysql:latest"
@@ -6,9 +7,9 @@ services:
     environment:
       MYSQL_USER: user1
       MYSQL_PASSWORD: password1
-      MYSQL_DATABASE: db
+      MYSQL_DATABASE: library
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "3306:3306"
     volumes:
-      - "./docker/dbInit:/docker-entrypoint-initdb.d"
+      - "./internal/db:/docker-entrypoint-initdb.d"
