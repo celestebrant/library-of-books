@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	books "github.com/celestebrant/library-of-books/books"
-	validate_book "github.com/celestebrant/library-of-books/validate_book"
 )
 
 type BooksServer struct {
@@ -15,7 +14,7 @@ type BooksServer struct {
 func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
-	err := validate_book.Validate(req.Book)
+	err := Validate(req.Book)
 	if err != nil {
 		return nil, fmt.Errorf("validation error: %w", err)
 	}

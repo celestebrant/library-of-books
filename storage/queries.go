@@ -6,7 +6,6 @@ import (
 	"time"
 
 	books "github.com/celestebrant/library-of-books/books"
-	validate_book "github.com/celestebrant/library-of-books/validate_book"
 	"github.com/oklog/ulid/v2"
 )
 
@@ -27,12 +26,13 @@ func (s *MysqlStorage) CreateBook(ctx context.Context, b *books.Book) (*books.Bo
 		b.Id = ulid.Make().String()
 	}
 
-	err := validate_book.Validate(b)
-	if err != nil {
-		return nil, fmt.Errorf("cannot insert book: %w", err)
-	}
+	// TODO: Move this validation logic elsewhere
+	// err := validate_book.Validate(b)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("cannot insert book: %w", err)
+	// }
 
-	_, err = s.db.ExecContext(ctx, query, b.Id, creationTime, b.Title, b.Author)
+	_, err := s.db.ExecContext(ctx, query, b.Id, creationTime, b.Title, b.Author)
 	if err != nil {
 		return &books.Book{}, fmt.Errorf("error during insert: %w", err)
 	}

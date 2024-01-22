@@ -59,10 +59,12 @@ Instructions:
 
 ## Using the deployed application
 ### Registering a book to the library
-To interact with the gRPC interface, you need to set up a client. An example of this exists in `???`. Try it out with `???`.
+To interact with the gRPC interface, you need to set up a client.
+
+<!-- An example of this exists in `???`. Try it out with `???`. -->
 
 This project is not yet complete and the following features shall be added in due course:
-* ~~gRPC endpoints for external transacting with the database~~ ✅
+* ~~gRPC service for external transacting with the database~~ ✅
 * Ability for a customer to take out a book
 * Ability for a customer to return a book
 * Alert customers if the book due date has been reached
@@ -87,7 +89,7 @@ Other handy database commands:
 
 ## Run tests:
 Tests exist for:
-* Book validation, `go test ./validate_book`
+* Book validation (unit), `go test ./internal/services/books_service`
 
 Test cases to be added:
 * gRPC calls (and client set up)
