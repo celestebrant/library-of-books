@@ -9,12 +9,12 @@ This project is a representation of a back-end application for a library. Curren
 ## Structure of the application
 The library application comes in two main parts:
 * A gRPC service, `Books`
-* A MySQL database, `db`
+* A MySQL database, `library`
 
 ### How it works
 The `Books` service, defined in `./books/books.proto`, serves an interface upon which the client may affect records stored in the MySQL database table, `books`.
 
-The schema for table `books` is as follows, which resides in database `db`:
+The schema for table `books` is as follows, which resides in database `library`:
 ```
 +---------------+--------------+------+-----+---------+-------+
 | Field         | Type         | Null | Key | Default | Extra |
@@ -26,7 +26,7 @@ The schema for table `books` is as follows, which resides in database `db`:
 | author        | varchar(255) | YES  |     | NULL    |       |
 +---------------+--------------+------+-----+---------+-------+
 ```
-(Via queries: `USE db;` then `SHOW COLUMNS FROM books;`)
+(Via queries: `USE library;` then `SHOW COLUMNS FROM books;`)
 
 ## Initialising the database
 It is possible to initialise the MySQL database in this project via a lightly manual process.
@@ -54,14 +54,11 @@ It is currently only possible to set up the `Books` gRPC server locally.
 
 Instructions:
 1. Ensure the latest Go-generated proto files exist by running `make generate_grpc_code`. Not working? Try running the `protoc` command which you can find inside that file, and ensure your GOPATH is correct.
-1. Run `go run ./cmd/server`
+1. Run `go run ./cmd/server`.
 1. You are now ready to make calls.
 
-## Using the deployed application
-### Registering a book to the library
-To interact with the gRPC interface, you need to set up a client.
-
-<!-- An example of this exists in `???`. Try it out with `???`. -->
+## Calling the gRPC server through a client
+To interact with the gRPC interface, you need to set up a client. An example of this exists in `./cmd/client/books_client.go`. Try it out with `go run ./cmd/client/` once your server is running.
 
 This project is not yet complete and the following features shall be added in due course:
 * ~~gRPC service for external transacting with the database~~ ✅
@@ -71,23 +68,23 @@ This project is not yet complete and the following features shall be added in du
 * Charge customers a fee for overdue books
 * Ban customers from taking out books
 
-### Interacting with the database directly
+## Interacting with the database directly
 While this is not recommended for real-life use, it may be useful for exploratory or debugging purposes.
 
-#### Write demo
+### Write demo
 A demo exists which creates a connection to the database and adds a book (writes a record to table `book`). You can run this with `go run ./cmd/db_write_demo`.
 
-#### Connecting to the database via terminal
+### Connecting to the database via terminal
 A demo username and password (`user1` and `password1`) is defined in `./docker-compose.yaml` intended for demo purposes only.
 
 Run ```docker-compose exec database mysql -uuser1 -ppassword1``` to access the database via terminal.
 
 Other handy database commands:
 * Show tables with `SHOW DATABASES;`
-* Change database with `USE <database name>;`, e.g. `USE db;`.
+* Change database with `USE <database name>;`, e.g. `USE library;`.
 * Show tables with `SHOW TABLES;`. If you don't see the tables you expected, perhaps the program cannot find your volume.
 
-## Run tests:
+## Tests
 Tests exist for:
 * Book validation (unit), `go test ./internal/services/books_service`
 
