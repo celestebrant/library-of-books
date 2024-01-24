@@ -6,6 +6,7 @@ import (
 
 	books "github.com/celestebrant/library-of-books/books"
 	"github.com/celestebrant/library-of-books/internal/services/books_service"
+	"github.com/celestebrant/library-of-books/storage"
 	"google.golang.org/grpc"
 )
 
@@ -18,11 +19,23 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	// Create a new database connection that the books server can use to write to the db
+	dbConnection, err := storage.NewMysqlStorage(storage.MysqlConfig{
+		Username: "user1",
+		Password: "password1",
+		DBName:   "library",
+		Port:     3306,
+		Host:     "localhost", // this code will execute in machine, not container
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Create a new gRPC server registered with booksServer
 	grpcServer := grpc.NewServer()
-	books.RegisterBooksServer(grpcServer, &books_service.BooksServer{})
-
-	// temporary address. Will replace with something dynamic through docker
+	books.RegisterBooksServer(grpcServer, &books_service.BooksServer{
+		MysqlStorage: &dbConnection,
+	})
 	log.Printf("gRPC server listening on %s", address)
 
 	// Connect the new server to the network listener

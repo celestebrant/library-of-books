@@ -4,7 +4,18 @@
 This project is a representation of a back-end application for a library. Currently, it is possible to:
 * Register a book to the library
 
-(And more functionality will be added in the future.)
+This project is not yet complete and the following features shall be added in due course:
+* ~~gRPC service for external transacting with the database~~ ✅
+* Ability for a customer to take out a book
+* Ability for a customer to return a book
+* Alert customers if the book due date has been reached
+* Charge customers a fee for overdue books
+* Ban customers from taking out books
+
+Known issues and limitations:
+* The forward conversion of `timestamppb.Timestamp` into table type `timestamp` loses decimal second precision. This is highlighted by failing test `TestCreateBookWritesToDB`.
+* `make generate_grpc_code` fails. Current workaround is to run the `protoc` command directly into terminal.
+* All packages in this project are publically visible.
 
 ## Structure of the application
 The library application comes in two main parts:
@@ -29,7 +40,7 @@ The schema for table `books` is as follows, which resides in database `library`:
 (Via queries: `USE library;` then `SHOW COLUMNS FROM books;`)
 
 ## Initialising the database
-It is possible to initialise the MySQL database in this project via a lightly manual process.
+It is possible to initialise the MySQL database in this project via `docker-compose`.
 
 The relevant files are:
 * `./docker-compose.yaml`, a configuration file used by Docker Compose to define and manage the containerised application.
@@ -53,28 +64,20 @@ Alternatively, close the Containers, Images and Volumes via the Docker engine di
 It is currently only possible to set up the `Books` gRPC server locally.
 
 Instructions:
-1. Ensure the latest Go-generated proto files exist by running `make generate_grpc_code`. Not working? Try running the `protoc` command which you can find inside that file, and ensure your GOPATH is correct.
+1. Ensure the latest Go-generated proto files exist by running `make generate_grpc_code`. You will need Go plugins for the protocol compiler. See the [gRPC docs](https://grpc.io/docs/languages/go/quickstart/) on how set this up.
 1. Run `go run ./cmd/server`.
-1. You are now ready to make calls.
+1. You are now ready to make calls. Your terminal should look like it is hanging.
 
-## Calling the gRPC server through a client
-To interact with the gRPC interface, you need to set up a client. An example of this exists in `./cmd/client/books_client.go`. Try it out with `go run ./cmd/client/` once your server is running.
-
-This project is not yet complete and the following features shall be added in due course:
-* ~~gRPC service for external transacting with the database~~ ✅
-* Ability for a customer to take out a book
-* Ability for a customer to return a book
-* Alert customers if the book due date has been reached
-* Charge customers a fee for overdue books
-* Ban customers from taking out books
+## Setting up a client
+To interact with the gRPC server, you need to set up a client. An example client exists in `./cmd/client/books_client.go`. Try it out with `go run ./cmd/client/` once your server is running (in a separate terminal window).
 
 ## Interacting with the database directly
 While this is not recommended for real-life use, it may be useful for exploratory or debugging purposes.
 
-### Write demo
+### Querying via code
 A demo exists which creates a connection to the database and adds a book (writes a record to table `book`). You can run this with `go run ./cmd/db_write_demo`.
 
-### Connecting to the database via terminal
+### Querying via terminal
 A demo username and password (`user1` and `password1`) is defined in `./docker-compose.yaml` intended for demo purposes only.
 
 Run ```docker-compose exec database mysql -uuser1 -ppassword1``` to access the database via terminal.
@@ -85,9 +88,14 @@ Other handy database commands:
 * Show tables with `SHOW TABLES;`. If you don't see the tables you expected, perhaps the program cannot find your volume.
 
 ## Tests
-Tests exist for:
-* Book validation (unit), `go test ./internal/services/books_service`
+Packages `testing` (internal) and `stretchr` (third party) are used in the tests.
+All test files look like `*_test.go`. Unit tests can be found within packages containing logic. Higher level tests can be found in `./tests/`.
+
+Coverage exists for:
+* Unit tests for book validation, `go test ./internal/services/books_service`
+* Integration tests, `go test ./tests`
 
 Test cases to be added:
 * gRPC calls (and client set up)
 * Negative db write handling
+* `TODO` comments in the codebase
