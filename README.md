@@ -13,7 +13,6 @@ This project is not yet complete and the following features shall be added in du
 * Ban customers from taking out books
 
 Known issues and limitations:
-* The forward conversion of `timestamppb.Timestamp` into table type `timestamp` loses decimal second precision. This is highlighted by failing test `TestCreateBookWritesToDB`.
 * `make generate_grpc_code` fails. Current workaround is to run the `protoc` command directly into terminal.
 * All packages in this project are publically visible.
 
