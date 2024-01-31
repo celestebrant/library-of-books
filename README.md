@@ -69,7 +69,7 @@ Instructions:
 1. You are now ready to make calls. Your terminal should look like it is hanging.
 
 ## Setting up a client
-To interact with the gRPC server, you need to set up a client. An example client exists in `./cmd/client/books_client.go`. Try it out with `go run ./cmd/client/` once your server is running (in a separate terminal window).
+To interact with the gRPC server, you need to set up a client. An example client exists in `./cmd/client/books_client.go`. Try it out with `go run ./cmd/client` once your server is running (in a separate terminal window).
 
 ## Interacting with the database directly
 While this is not recommended for real-life use, it may be useful for exploratory or debugging purposes.
