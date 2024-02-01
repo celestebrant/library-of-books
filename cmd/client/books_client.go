@@ -8,12 +8,13 @@ import (
 	books "github.com/celestebrant/library-of-books/books"
 	"github.com/oklog/ulid/v2"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func main() {
 	// Connect to server
-	clientConnection, err := grpc.Dial("127.0.0.1:8089", grpc.WithInsecure())
+	clientConnection, err := grpc.Dial("127.0.0.1:8089", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
