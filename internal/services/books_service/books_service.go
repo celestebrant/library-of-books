@@ -2,10 +2,11 @@ package books_service
 
 import (
 	"context"
-	"fmt"
 
 	books "github.com/celestebrant/library-of-books/books"
 	"github.com/celestebrant/library-of-books/storage"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type BooksServer struct {
@@ -17,8 +18,9 @@ func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
 	err := Validate(req.Book)
+
 	if err != nil {
-		return nil, fmt.Errorf("validation error: %w", err)
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	// TODO: decide if returned Book should be used in res. If no, add tests to compare res.Book with db-returned book

@@ -16,10 +16,10 @@ type Book struct {
 // validateAuthor returns an error if author exceeds 255 characters or is empty.
 func validateAuthor(b *books.Book) error {
 	if len(b.Author) > 255 {
-		return &InvalidAuthorError{"author exceeds 255 characters"}
+		return &InvalidAuthorError{"author cannot exceed 255 characters"}
 	}
 	if len(b.Author) == 0 {
-		return &InvalidAuthorError{"author is empty"}
+		return &InvalidAuthorError{"author cannot be empty"}
 	}
 	return nil
 }
@@ -27,10 +27,10 @@ func validateAuthor(b *books.Book) error {
 // validateTitle returns an error if title exceeds 255 characters or is empty.
 func validateTitle(b *books.Book) error {
 	if len(b.Title) > 255 {
-		return &InvalidTitleError{"title exceeds 255 characters"}
+		return &InvalidTitleError{"title cannot exceed 255 characters"}
 	}
 	if len(b.Title) == 0 {
-		return &InvalidTitleError{"title is empty"}
+		return &InvalidTitleError{"title cannot be empty"}
 	}
 	return nil
 }
@@ -38,10 +38,10 @@ func validateTitle(b *books.Book) error {
 // validateID returns an error if ID exceeds 255 characters or is empty.
 func validateID(b *books.Book) error {
 	if len(b.Id) > 26 {
-		return &InvalidIDError{"id exceeds 255 characters"}
+		return &InvalidIDError{"id cannot exceed 255 characters"}
 	}
 	if len(b.Id) == 0 {
-		return &InvalidIDError{"id is empty"}
+		return &InvalidIDError{"id cannot be empty"}
 	}
 	return nil
 }
@@ -50,12 +50,13 @@ func validateID(b *books.Book) error {
 func validateCreationTime(b *books.Book) error {
 	time := b.CreationTime.AsTime()
 	if time.IsZero() {
-		return &InvalidCreationTimeError{"creation time has zero value"}
+		return &InvalidCreationTimeError{"creation time cannot have zero value"}
 	}
 	return nil
 }
 
-// Validate validates ID, author, title, and creation timestamp of a Book.
+// Validate returns an error for semantically invalid fields for b:
+// Id, Author, Title, and CreationTime.
 func Validate(b *books.Book) error {
 	err := validateAuthor(b)
 	if err != nil {
