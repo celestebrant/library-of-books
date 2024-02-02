@@ -16,9 +16,7 @@ import (
 // MustNewBooksServer creates a new BooksServer in a goroutine, and panics if setup fails.
 // Returns the books gRPC server and its network listener, and subsequence closures
 // should be deferred with *grpc.Server.Stop() and net.Listener.Close().
-func MustNewBooksServer(address string) (*grpc.Server, net.Listener, *sync.WaitGroup) {
-	var wg sync.WaitGroup
-
+func MustNewBooksServer(address string, wg *sync.WaitGroup) (*grpc.Server, net.Listener) {
 	// Create a network listener
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
@@ -45,7 +43,6 @@ func MustNewBooksServer(address string) (*grpc.Server, net.Listener, *sync.WaitG
 	log.Printf("gRPC server books listening on %s", address)
 
 	// Connect the new server to the network listener in a goroutine
-	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		err = grpcServer.Serve(lis)
@@ -54,7 +51,7 @@ func MustNewBooksServer(address string) (*grpc.Server, net.Listener, *sync.WaitG
 		}
 	}()
 
-	return grpcServer, lis, &wg
+	return grpcServer, lis
 }
 
 // StopBooksServer stops server, closes lis and waits until wg is zero.

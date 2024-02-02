@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -20,11 +21,13 @@ import (
 // setUpServerAndClient sets up the server and client. Returns the client and
 // tear-down actvities which should be deferred.
 func setUpServerAndClient(address string) (books.BooksClient, func()) {
-	server, lis, wg := booksservice.MustNewBooksServer(address)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	server, lis := booksservice.MustNewBooksServer(address, &wg)
 	client, conn := booksclient.MustNewBooksClient(address)
 
 	return client, func() {
-		booksservice.StopBooksServer(server, lis, wg)
+		booksservice.StopBooksServer(server, lis, &wg)
 		conn.Close()
 	}
 }
