@@ -8,6 +8,7 @@ import (
 
 	books "github.com/celestebrant/library-of-books/books"
 	"github.com/celestebrant/library-of-books/internal/services/booksclient"
+	"github.com/celestebrant/library-of-books/internal/services/booksservice"
 	"github.com/celestebrant/library-of-books/storage"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/require"
@@ -16,11 +17,23 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// setUpServerAndClient sets up the server and client. Returns the client and
+// tear-down actvities which should be deferred.
+func setUpServerAndClient(address string) (books.BooksClient, func()) {
+	server, lis, wg := booksservice.MustNewBooksServer(address)
+	client, conn := booksclient.MustNewBooksClient(address)
+
+	return client, func() {
+		booksservice.StopBooksServer(server, lis, wg)
+		conn.Close()
+	}
+}
+
 // TestCreateBook contains integration tests for the CreateBook endpoint.
-// It creates a client and assumes a server is already running.
 func TestCreateBook(t *testing.T) {
-	client, conn := booksclient.MustNewBooksClient("127.0.0.1:8089")
-	defer conn.Close()
+	// Prepare set up and tear down of server and client.
+	client, tearDown := setUpServerAndClient("127.0.0.1:8089")
+	defer tearDown()
 
 	t.Run("writes to db", func(t *testing.T) {
 		r := require.New(t)
