@@ -91,7 +91,7 @@ Packages `testing` (internal) and `stretchr` (third party) are used in the tests
 All test files look like `*_test.go`. Unit tests can be found within packages containing logic. Higher level tests can be found in `./tests/`.
 
 Coverage exists for:
-* Unit tests for book validation, `go test ./internal/services/books_service`
+* Unit tests for book validation, `go test ./internal/services/booksservice`
 * Integration tests, `go test ./tests`
 
 Test cases to be added:

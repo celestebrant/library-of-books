@@ -1,4 +1,4 @@
-package books_service
+package booksservice
 
 type InvalidAuthorError struct {
 	Message string

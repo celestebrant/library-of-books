@@ -5,7 +5,7 @@ import (
 	"net"
 
 	books "github.com/celestebrant/library-of-books/books"
-	"github.com/celestebrant/library-of-books/internal/services/books_service"
+	"github.com/celestebrant/library-of-books/internal/services/booksservice"
 	"github.com/celestebrant/library-of-books/storage"
 	"google.golang.org/grpc"
 )
@@ -33,7 +33,7 @@ func main() {
 
 	// Create a new gRPC server registered with booksServer
 	grpcServer := grpc.NewServer()
-	books.RegisterBooksServer(grpcServer, &books_service.BooksServer{
+	books.RegisterBooksServer(grpcServer, &booksservice.BooksServer{
 		MysqlStorage: &dbConnection,
 	})
 	log.Printf("gRPC server listening on %s", address)
