@@ -18,7 +18,6 @@ func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
 	err := Validate(req.Book)
-
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

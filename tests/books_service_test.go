@@ -7,33 +7,25 @@ import (
 	"time"
 
 	books "github.com/celestebrant/library-of-books/books"
+	"github.com/celestebrant/library-of-books/internal/services/booksclient"
 	"github.com/celestebrant/library-of-books/storage"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const booksServerAddress = "127.0.0.1:8089"
-
 // TestCreateBook contains integration tests for the CreateBook endpoint.
 // It creates a client and assumes a server is already running.
 func TestCreateBook(t *testing.T) {
-	// Connect to server and create client
-	clientConnection, err := grpc.Dial(booksServerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Panicf("failed to connect: %v", err)
-	}
-	defer clientConnection.Close()
-	books_client := books.NewBooksClient(clientConnection)
+	client, conn := booksclient.MustNewBooksClient("127.0.0.1:8089")
+	defer conn.Close()
 
 	t.Run("writes to db", func(t *testing.T) {
 		r := require.New(t)
 
-		res, err := books_client.CreateBook(
+		res, err := client.CreateBook(
 			context.Background(),
 			&books.CreateBookRequest{
 				Book: &books.Book{
@@ -72,7 +64,7 @@ func TestCreateBook(t *testing.T) {
 		// Verify that validation is performed by attempting to raise an
 		// invalid argument via empty author.
 		r := require.New(t)
-		res, err := books_client.CreateBook(
+		res, err := client.CreateBook(
 			context.Background(),
 			&books.CreateBookRequest{
 				Book: &books.Book{

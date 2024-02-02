@@ -6,25 +6,16 @@ import (
 	"time"
 
 	books "github.com/celestebrant/library-of-books/books"
+	"github.com/celestebrant/library-of-books/internal/services/booksclient"
 	"github.com/oklog/ulid/v2"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func main() {
-	// Connect to server
-	clientConnection, err := grpc.Dial("127.0.0.1:8089", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
-	}
-	defer clientConnection.Close()
+	client, conn := booksclient.MustNewBooksClient("127.0.0.1:8089")
+	defer conn.Close()
 
-	// Create client
-	books_client := books.NewBooksClient(clientConnection)
-
-	// Call gRPC method
-	res, err := books_client.CreateBook(
+	res, err := client.CreateBook(
 		context.Background(),
 		&books.CreateBookRequest{
 			Book: &books.Book{
@@ -39,5 +30,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to call CreateBook: %v", err)
 	}
-	log.Printf("Called CreateBook: %v", res)
+	log.Printf("created book via CreateBook: %v", res)
 }
