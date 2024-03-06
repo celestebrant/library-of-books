@@ -28,8 +28,7 @@ func (s *MysqlStorage) CreateBook(ctx context.Context, b *books.Book) (*books.Bo
 		b.Id = ulid.Make().String()
 	}
 
-	_, err := s.db.ExecContext(ctx, query, b.Id, creationTime, b.Title, b.Author)
-	if err != nil {
+	if _, err := s.db.ExecContext(ctx, query, b.Id, creationTime, b.Title, b.Author); err != nil {
 		return &books.Book{}, fmt.Errorf("error during insert: %w", err)
 	}
 
@@ -43,8 +42,7 @@ func (s *MysqlStorage) GetBook(ctx context.Context, bookID string) (books.Book, 
 	query := "SELECT id, author, title, creation_time FROM books WHERE id = ? ;"
 
 	row := s.db.QueryRowContext(ctx, query, bookID)
-	err := row.Scan(&id, &author, &title, &creationTimeDB)
-	if err != nil {
+	if err := row.Scan(&id, &author, &title, &creationTimeDB); err != nil {
 		return books.Book{}, err
 	}
 

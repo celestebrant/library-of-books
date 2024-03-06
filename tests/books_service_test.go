@@ -34,8 +34,8 @@ func setUpServerAndClient(address string) (books.BooksClient, func()) {
 
 // TestCreateBook contains integration tests for the CreateBook endpoint.
 func TestCreateBook(t *testing.T) {
-	// Prepare set up and tear down of server and client.
-	client, tearDown := setUpServerAndClient("127.0.0.1:8089")
+	// Prepare set up and tear down of server and client on different port.
+	client, tearDown := setUpServerAndClient("127.0.0.1:8090")
 	defer tearDown()
 
 	t.Run("writes to db", func(t *testing.T) {

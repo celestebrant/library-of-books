@@ -73,14 +73,14 @@ type BooksServer struct {
 func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
-	err := Validate(req.Book)
-	if err != nil {
+	if err := Validate(req.Book); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	// TODO: decide if returned Book should be used in res. If no, add tests to compare res.Book with db-returned book
-	_, err = s.MysqlStorage.CreateBook(ctx, req.Book)
+	if _, err := s.MysqlStorage.CreateBook(ctx, req.Book); err != nil {
+		return nil, status.Error(codes.FailedPrecondition, err.Error())
+	}
 
-	res := &books.CreateBookResponse{Book: req.Book}
-	return res, nil
+	return &books.CreateBookResponse{Book: req.Book}, nil
 }

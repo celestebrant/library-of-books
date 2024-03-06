@@ -39,8 +39,7 @@ func main() {
 	log.Printf("gRPC server listening on %s", address)
 
 	// Connect the new server to the network listener
-	err = grpcServer.Serve(lis)
-	if err != nil {
+	if err = grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve %v", err)
 	}
 }
