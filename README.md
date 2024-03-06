@@ -17,12 +17,14 @@ Known issues and limitations:
 * All packages in this project are publically visible.
 
 ## Structure of the application
-The library application comes in two main parts:
-* A gRPC service, `Books`
-* A MySQL database, `library`
+The library application comes in two main parts, in order of required deployment for use:
+1. A MySQL database, `library`
+1. A gRPC service, `Books`
+
+After the application is running fully, you may create a client which can interact with the `books` service. See section "Setting up a client" for more on this.
 
 ### How it works
-The `Books` service, defined in `./books/books.proto`, serves an interface upon which the client may affect records stored in the MySQL database table, `books`.
+The `Books` service, defined in `./books/books.proto` allows the client to perform actions such as creating books. It serves an interface upon which a client may affect records stored in the `books` table of the `library` database.
 
 The schema for table `books` is as follows, which resides in database `library`:
 ```
