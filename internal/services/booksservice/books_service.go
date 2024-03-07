@@ -69,8 +69,9 @@ type BooksServer struct {
 	*storage.MysqlStorage
 }
 
-// CreateBook validates req.Book, populates and creates a record of book
-// in the database. Returns the created book in CreateBookResponse.
+// CreateBook processes a CreateBookRequest to validate the input, create a new Book record from the request,
+// and insert it into the database. It returns a CreateBookResponse containing the created book or an error
+// if validation fails, or the database operation is unsuccessful.
 func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
@@ -78,7 +79,7 @@ func (s *BooksServer) CreateBook(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	book := storage.NewBook(req)
+	book := storage.NewBookFromRequest(req)
 	if err := s.MysqlStorage.CreateBook(ctx, book); err != nil {
 		return nil, status.Error(codes.FailedPrecondition, err.Error())
 	}

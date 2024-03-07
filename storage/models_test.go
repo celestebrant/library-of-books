@@ -24,7 +24,7 @@ func TestNewBook(t *testing.T) {
 				CreationTime: timestamppb.New(creationTime),
 			},
 		}
-		book := NewBook(req)
+		book := NewBookFromRequest(req)
 		expected := Book{
 			Id:           "hello",
 			Title:        "Some title",
@@ -46,7 +46,7 @@ func TestNewBook(t *testing.T) {
 			req.Book.CreationTime.AsTime(),
 			"unexpected default value of CreateBookRequest.Book.CreationTimestamp",
 		)
-		book := NewBook(req)
+		book := NewBookFromRequest(req)
 		a.NotEmpty(book.Id, "expected Id to be populated")
 		a.True(
 			book.CreationTime.UTC().After(testStartTime.UTC()),
