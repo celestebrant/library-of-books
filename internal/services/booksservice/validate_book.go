@@ -35,18 +35,15 @@ func validateTitle(b *books.Book) error {
 	return nil
 }
 
-// validateID returns an error if ID exceeds 26 characters or is empty.
+// validateID returns an error if ID exceeds 26 characters.
 func validateID(b *books.Book) error {
 	if len(b.Id) > 26 {
 		return &InvalidIDError{"id cannot exceed 26 characters"}
 	}
-	if len(b.Id) == 0 {
-		return &InvalidIDError{"id cannot be empty"}
-	}
 	return nil
 }
 
-// Validate returns an error for semantically invalid fields for b:
+// Validate returns an error for semantically invalid fields:
 // Id, Author, Title.
 func Validate(b *books.Book) error {
 	if err := validateAuthor(b); err != nil {

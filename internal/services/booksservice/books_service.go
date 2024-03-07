@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // MustNewBooksServer creates a new BooksServer in a goroutine, and panics if setup fails.
@@ -82,6 +83,10 @@ func (s *BooksServer) CreateBook(
 		return nil, status.Error(codes.FailedPrecondition, err.Error())
 	}
 
-	// TODO: return storage.Book, not req.Book
-	return &books.CreateBookResponse{Book: req.Book}, nil
+	return &books.CreateBookResponse{Book: &books.Book{
+		Id:           book.Id,
+		Title:        book.Title,
+		Author:       book.Author,
+		CreationTime: timestamppb.New(book.CreationTime),
+	}}, nil
 }

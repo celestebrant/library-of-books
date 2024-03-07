@@ -108,16 +108,6 @@ func TestValidateID(t *testing.T) {
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
 	})
-
-	t.Run("empty returns error", func(t *testing.T) {
-		r := require.New(t)
-		book := &books.Book{
-			Id: ``,
-		}
-		err := validateID(book)
-		var invalidIDError *InvalidIDError
-		r.ErrorAs(err, &invalidIDError)
-	})
 }
 
 func TestValidate(t *testing.T) {
@@ -166,10 +156,9 @@ func TestValidate(t *testing.T) {
 		book := &books.Book{
 			Author:       `author1`,
 			Title:        `title1`,
-			Id:           ``,
+			Id:           `length one greater than max`,
 			CreationTime: timestamppb.New(time.Now()),
 		}
-
 		err := Validate(book)
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
