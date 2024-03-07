@@ -120,27 +120,6 @@ func TestValidateID(t *testing.T) {
 	})
 }
 
-func TestValidateCreationTime(t *testing.T) {
-	t.Run("now", func(t *testing.T) {
-		r := require.New(t)
-		book := &books.Book{
-			CreationTime: timestamppb.New(time.Now()),
-		}
-		err := validateCreationTime(book)
-		r.NoError(err)
-	})
-
-	t.Run("zero value returns error", func(t *testing.T) {
-		r := require.New(t)
-		book := &books.Book{
-			CreationTime: timestamppb.New(time.Time{}),
-		}
-		err := validateCreationTime(book)
-		var invalidCreationTimeError *InvalidCreationTimeError
-		r.ErrorAs(err, &invalidCreationTimeError)
-	})
-}
-
 func TestValidate(t *testing.T) {
 	t.Run("positive returns no error", func(t *testing.T) {
 		r := require.New(t)
@@ -194,19 +173,5 @@ func TestValidate(t *testing.T) {
 		err := Validate(book)
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
-	})
-
-	t.Run("validates creation time", func(t *testing.T) {
-		r := require.New(t)
-		book := &books.Book{
-			Author:       `author1`,
-			Title:        `title1`,
-			Id:           ulid.Make().String(),
-			CreationTime: timestamppb.New(time.Time{}),
-		}
-
-		err := Validate(book)
-		var invalidCreationTimeError *InvalidCreationTimeError
-		r.ErrorAs(err, &invalidCreationTimeError)
 	})
 }

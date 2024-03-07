@@ -68,7 +68,7 @@ type BooksServer struct {
 	*storage.MysqlStorage
 }
 
-// CreateBook semantically validates the Book contained in req and creates a record of book
+// CreateBook validates req.Book, populates and creates a record of book
 // in the database. Returns the created book in CreateBookResponse.
 func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
@@ -77,10 +77,11 @@ func (s *BooksServer) CreateBook(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	// TODO: decide if returned Book should be used in res. If no, add tests to compare res.Book with db-returned book
-	if _, err := s.MysqlStorage.CreateBook(ctx, req.Book); err != nil {
+	book := storage.NewBook(req)
+	if err := s.MysqlStorage.CreateBook(ctx, book); err != nil {
 		return nil, status.Error(codes.FailedPrecondition, err.Error())
 	}
 
+	// TODO: return storage.Book, not req.Book
 	return &books.CreateBookResponse{Book: req.Book}, nil
 }

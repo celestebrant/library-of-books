@@ -3,10 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"time"
-
-	books "github.com/celestebrant/library-of-books/books"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	storage "github.com/celestebrant/library-of-books/storage"
 )
@@ -23,14 +19,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	b, err := dbConnection.CreateBook(context.Background(), &books.Book{
-		CreationTime: timestamppb.New(time.Now()),
-		Title:        "title1",
-		Author:       "author1",
-	})
-	if err != nil {
-		log.Fatalf("cannot insert book into table `books`: %v", err)
+	book := &storage.Book{
+		Title:  "title1",
+		Author: "author1",
+	}
+	if err = dbConnection.CreateBook(context.Background(), book); err != nil {
+		log.Fatalf("cannot insert into table `books`: %v", err)
 	}
 
-	log.Printf("inserted book into table: %v", b)
+	log.Printf("inserted book into table: %v", book)
+
+	// TODO: GetBook
 }

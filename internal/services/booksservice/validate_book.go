@@ -35,10 +35,10 @@ func validateTitle(b *books.Book) error {
 	return nil
 }
 
-// validateID returns an error if ID exceeds 255 characters or is empty.
+// validateID returns an error if ID exceeds 26 characters or is empty.
 func validateID(b *books.Book) error {
 	if len(b.Id) > 26 {
-		return &InvalidIDError{"id cannot exceed 255 characters"}
+		return &InvalidIDError{"id cannot exceed 26 characters"}
 	}
 	if len(b.Id) == 0 {
 		return &InvalidIDError{"id cannot be empty"}
@@ -46,35 +46,18 @@ func validateID(b *books.Book) error {
 	return nil
 }
 
-// validateCreationTime returns an error if creation time has a zero-value.
-func validateCreationTime(b *books.Book) error {
-	time := b.CreationTime.AsTime()
-	if time.IsZero() {
-		return &InvalidCreationTimeError{"creation time cannot have zero value"}
-	}
-	return nil
-}
-
 // Validate returns an error for semantically invalid fields for b:
-// Id, Author, Title, and CreationTime.
+// Id, Author, Title.
 func Validate(b *books.Book) error {
-	err := validateAuthor(b)
-	if err != nil {
+	if err := validateAuthor(b); err != nil {
 		return err
 	}
 
-	err = validateTitle(b)
-	if err != nil {
+	if err := validateTitle(b); err != nil {
 		return err
 	}
 
-	err = validateID(b)
-	if err != nil {
-		return err
-	}
-
-	err = validateCreationTime(b)
-	if err != nil {
+	if err := validateID(b); err != nil {
 		return err
 	}
 
