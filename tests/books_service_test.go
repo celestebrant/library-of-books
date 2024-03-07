@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"sync"
 	"testing"
@@ -54,6 +55,7 @@ func TestCreateBook(t *testing.T) {
 		r.NoError(err)
 		r.NotEmpty(res)
 
+		// Validate RPC response against request
 		a.Equal(req.Book.Title, res.Book.Title)
 		a.Equal(req.Book.Author, res.Book.Author)
 		a.Truef(
@@ -64,7 +66,7 @@ func TestCreateBook(t *testing.T) {
 		)
 		a.NotEmpty(res.Book.Id)
 
-		// Verify against db record
+		// Verify db record
 		dbConnection, err := storage.NewMysqlStorage(storage.MysqlConfig{
 			Username: "user1",
 			Password: "password1",
@@ -78,10 +80,12 @@ func TestCreateBook(t *testing.T) {
 
 		book, err := dbConnection.GetBook(context.Background(), res.Book.Id)
 		r.NoError(err)
-		r.NotEmpty(book.Id)
-		r.Equal(res.Book.Author, book.Author)
-		r.Equal(res.Book.Title, book.Title)
-		r.True(book.CreationTime.AsTime().After(testStartTime))
+
+		// Verify db values against request
+		a.NotEmpty(book.Id)
+		a.Equal(req.Book.Author, book.Author)
+		a.Equal(req.Book.Title, book.Title)
+		a.True(book.CreationTime.After(testStartTime))
 	})
 
 	t.Run("all request fields populated writes to db", func(t *testing.T) {
@@ -101,12 +105,13 @@ func TestCreateBook(t *testing.T) {
 		r.NoError(err)
 		r.NotEmpty(res)
 
+		// Validate RPC response against request
 		a.Equal(req.Book.Id, res.Book.Id)
 		a.Equal(req.Book.Title, res.Book.Title)
 		a.Equal(req.Book.Author, res.Book.Author)
 		a.Equal(req.Book.CreationTime.AsTime(), res.Book.CreationTime.AsTime())
 
-		// Verify against db record
+		// Verify db record
 		dbConnection, err := storage.NewMysqlStorage(storage.MysqlConfig{
 			Username: "user1",
 			Password: "password1",
@@ -120,29 +125,45 @@ func TestCreateBook(t *testing.T) {
 
 		book, err := dbConnection.GetBook(context.Background(), res.Book.Id)
 		r.NoError(err)
-		r.Equal(res.Book.Id, book.Id)
-		r.Equal(res.Book.Author, book.Author)
-		r.Equal(res.Book.Title, book.Title)
-		r.Equal(res.Book.CreationTime, book.CreationTime)
+
+		// Validate db values against request
+		r.Equal(req.Book.Id, book.Id)
+		r.Equal(req.Book.Author, book.Author)
+		r.Equal(req.Book.Title, book.Title)
+		r.Equal(req.Book.CreationTime.AsTime(), book.CreationTime)
 	})
 
-	t.Run("validation", func(t *testing.T) {
+	t.Run("validation error does not write to db", func(t *testing.T) {
 		// Verify that validation is performed by attempting to raise an
 		// invalid argument via empty author.
-		r := require.New(t)
-		res, err := client.CreateBook(
-			context.Background(),
-			&books.CreateBookRequest{
-				Book: &books.Book{
-					Id:           ulid.Make().String(),
-					Title:        ulid.Make().String(),
-					Author:       "",
-					CreationTime: timestamppb.New(time.Now()),
-				},
-				RequestId: ulid.Make().String(),
+		r, a := require.New(t), assert.New(t)
+		req := &books.CreateBookRequest{
+			Book: &books.Book{
+				Id:           ulid.Make().String(),
+				Title:        ulid.Make().String(),
+				Author:       "",
+				CreationTime: timestamppb.New(time.Now()),
 			},
-		)
-		r.Equal(codes.InvalidArgument, status.Code(err), "expected invalid argument")
+			RequestId: ulid.Make().String(),
+		}
+		res, err := client.CreateBook(context.Background(), req)
+		a.Equal(codes.InvalidArgument, status.Code(err), "expected invalid argument")
 		r.Zero(res)
+
+		// Verify no db record exists
+		dbConnection, err := storage.NewMysqlStorage(storage.MysqlConfig{
+			Username: "user1",
+			Password: "password1",
+			DBName:   "library",
+			Port:     3306,
+			Host:     "localhost",
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		book, err := dbConnection.GetBook(context.Background(), req.Book.Id)
+		a.ErrorIs(err, sql.ErrNoRows, "expected sql.ErrNoRows type error if no record found")
+		a.Empty(book)
 	})
 }
