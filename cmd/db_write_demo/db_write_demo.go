@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	storage "github.com/celestebrant/library-of-books/storage"
 )
@@ -22,6 +23,7 @@ func main() {
 	book := &storage.Book{
 		Title:  "title1",
 		Author: "author1",
+		CreationTime: time.Now().UTC(),
 	}
 	if err = dbConnection.CreateBook(context.Background(), book); err != nil {
 		log.Fatalf("cannot insert into table `books`: %v", err)
@@ -29,5 +31,5 @@ func main() {
 
 	log.Printf("inserted book into table: %v", book)
 
-	// TODO: GetBook
+	// TODO: fetch book
 }
