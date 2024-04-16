@@ -6,6 +6,7 @@ This project is a representation of a back-end application for a library. Curren
 
 This project is not yet complete and the following features shall be added in due course:
 * ~~gRPC service for external transacting with the database~~ ✅
+* Ability to search for books by author, title, etc.
 * Ability for a customer to take out a book
 * Ability for a customer to return a book
 * Alert customers if the book due date has been reached
@@ -48,7 +49,7 @@ The relevant files are:
 * `./docker/dbinit/init.sql`, containing the schema.
 
 Instructions:
-1. Ensure you have the Docker engine installed and running. On Mac, open the Docker application.
+1. Ensure you have the Docker engine installed and running. On Mac, open the Docker application. Also ensure you are connected to the internet.
 1. In a terminal window, run `docker-compose up`. This reads `docker-compose.yaml` and creates a container ready for the MySQL database.
 1. If this is left running, then the database is ready.
 
