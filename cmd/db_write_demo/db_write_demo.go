@@ -35,14 +35,14 @@ func main() {
 
 	log.Printf(`inserted record into "books" table: %v`, *book)
 
-	books, err := dbConnection.ListBooks(context.Background(), author, title, 10, "")
+	listBooksRes, err := dbConnection.ListBooks(context.Background(), author, title, 10, "")
 	if err != nil {
 		log.Fatalf(`error encountered during ListBooks SQL operation: %v`, err)
 	}
 
-	log.Printf(`fetched %d records via ListBooks from "books" table:`, len(books))
-	if len(books) > 0 {
-		for _, book := range books {
+	log.Printf(`fetched %d records via ListBooks from "books" table:`, len(listBooksRes.Books))
+	if len(listBooksRes.Books) > 0 {
+		for _, book := range listBooksRes.Books {
 			fmt.Printf("- %v\n", book)
 		}
 	}

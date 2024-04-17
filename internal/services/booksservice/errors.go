@@ -31,3 +31,11 @@ type InvalidCreationTimeError struct {
 func (e *InvalidCreationTimeError) Error() string {
 	return e.Message
 }
+
+type InvalidPageSizeError struct {
+	Message string
+}
+
+func (e *InvalidPageSizeError) Error() string {
+	return e.Message
+}

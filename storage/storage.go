@@ -8,4 +8,5 @@ import (
 
 type Storage interface {
 	CreateBook(context.Context, *books.Book) (*books.Book, error)
+	ListBooks(context.Context, *books.ListBooksRequest) (*books.ListBooksResponse, error)
 }

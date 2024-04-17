@@ -32,7 +32,7 @@ The schema for table `books` is as follows, which resides in database `library`:
 +---------------+--------------+------+-----+---------+-------+
 | Field         | Type         | Null | Key | Default | Extra |
 +---------------+--------------+------+-----+---------+-------+
-| id            | varchar(26)  | NO   | PRI | NULL    |       |
+| id            | varchar(30)  | NO   | PRI | NULL    |       |
 | creation_time | timestamp    | YES  |     | NULL    |       |
 | update_time   | timestamp    | YES  |     | NULL    |       |
 | title         | varchar(255) | YES  |     | NULL    |       |

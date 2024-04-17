@@ -4,6 +4,7 @@ import "google/protobuf/timestamp.proto";
 
 service Books {
     rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
+    rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
 }
 
 message Book {
@@ -20,4 +21,16 @@ message CreateBookRequest {
 
 message CreateBookResponse {
     Book book = 1;
+}
+
+message ListBooksRequest {
+    string author = 1;
+    string title = 2;
+    int64 page_size = 3;
+    string next_page_token = 4;
+}
+
+message ListBooksResponse {
+    repeated Book books = 1;
+    string next_page_token = 2;
 }

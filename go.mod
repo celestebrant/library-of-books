@@ -4,6 +4,7 @@ go 1.21.6
 
 require (
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/google/go-cmp v0.6.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/grpc v1.63.2

@@ -91,3 +91,18 @@ func (s *BooksServer) CreateBook(
 		CreationTime: timestamppb.New(book.CreationTime),
 	}}, nil
 }
+
+func (s *BooksServer) ListBooks(
+	ctx context.Context, req *books.ListBooksRequest,
+) (*books.ListBooksResponse, error) {
+	if err := ValidateListBooksRequest(req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	res, err := s.MysqlStorage.ListBooks(ctx, req.Author, req.Title, req.PageSize, req.NextPageToken)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, err.Error())
+	}
+
+	return res, nil
+}

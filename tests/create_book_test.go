@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	books "github.com/celestebrant/library-of-books/books"
+	"github.com/celestebrant/library-of-books/books"
 	"github.com/celestebrant/library-of-books/internal/services/booksclient"
 	"github.com/celestebrant/library-of-books/internal/services/booksservice"
 	"github.com/celestebrant/library-of-books/storage"
@@ -34,14 +34,13 @@ func setUpServerAndClient(address string) (books.BooksClient, func()) {
 	}
 }
 
-// TestCreateBook contains integration tests for the CreateBook endpoint.
-// Coverage for response and if db is written to correctly.
+// TestCreateBook contains integration tests for the CreateBook endpoint and db.
 func TestCreateBook(t *testing.T) {
 	// Prepare set up and tear down of server and client on different port.
 	client, tearDown := setUpServerAndClient("127.0.0.1:8090")
 	defer tearDown()
 
-	t.Run("mandatory request fields populated writes to db", func(t *testing.T) {
+	t.Run("request with mandatory request fields only writes to db", func(t *testing.T) {
 		r, a := require.New(t), assert.New(t)
 		testStartTime := time.Now()
 		req := &books.CreateBookRequest{
@@ -66,7 +65,7 @@ func TestCreateBook(t *testing.T) {
 		)
 		a.NotEmpty(res.Book.Id)
 
-		// Verify db record
+		// Validate db record against request
 		dbConnection, err := storage.NewMysqlStorage(storage.MysqlConfig{
 			Username: "user1",
 			Password: "password1",
@@ -81,14 +80,13 @@ func TestCreateBook(t *testing.T) {
 		book, err := dbConnection.GetBook(context.Background(), res.Book.Id)
 		r.NoError(err)
 
-		// Verify db values against request
 		a.NotEmpty(book.Id)
 		a.Equal(req.Book.Author, book.Author)
 		a.Equal(req.Book.Title, book.Title)
 		a.True(book.CreationTime.After(testStartTime))
 	})
 
-	t.Run("all request fields populated writes to db", func(t *testing.T) {
+	t.Run("request with all fields populated writes to db", func(t *testing.T) {
 		r, a := require.New(t), assert.New(t)
 
 		now := time.Now()
@@ -111,7 +109,7 @@ func TestCreateBook(t *testing.T) {
 		a.Equal(req.Book.Author, res.Book.Author)
 		a.Equal(req.Book.CreationTime.AsTime(), res.Book.CreationTime.AsTime())
 
-		// Verify db record
+		// Validate db record against request
 		dbConnection, err := storage.NewMysqlStorage(storage.MysqlConfig{
 			Username: "user1",
 			Password: "password1",
@@ -126,7 +124,6 @@ func TestCreateBook(t *testing.T) {
 		book, err := dbConnection.GetBook(context.Background(), res.Book.Id)
 		r.NoError(err)
 
-		// Validate db values against request
 		r.Equal(req.Book.Id, book.Id)
 		r.Equal(req.Book.Author, book.Author)
 		r.Equal(req.Book.Title, book.Title)

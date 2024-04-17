@@ -1,14 +1,15 @@
 package booksservice
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	books "github.com/celestebrant/library-of-books/books"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/celestebrant/library-of-books/books"
+	"github.com/celestebrant/library-of-books/utils"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestValidateAuthor(t *testing.T) {
@@ -16,7 +17,7 @@ func TestValidateAuthor(t *testing.T) {
 
 	t.Run("max length", func(t *testing.T) {
 		r := require.New(t)
-		author := `author with 255 characters: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
+		author := utils.StringWithLength(authorMaxLength)
 		r.Len(author, 255)
 
 		book := &books.Book{
@@ -28,7 +29,7 @@ func TestValidateAuthor(t *testing.T) {
 
 	t.Run("max length + 1 returns error", func(t *testing.T) {
 		r := require.New(t)
-		author := `author with 256 characters: baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
+		author := utils.StringWithLength(authorMaxLength + 1)
 		r.Len(author, 256)
 
 		book := &books.Book{
@@ -55,7 +56,7 @@ func TestValidateTitle(t *testing.T) {
 
 	t.Run("max length", func(t *testing.T) {
 		r := require.New(t)
-		title := `title with 255 characters: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
+		title := utils.StringWithLength(titleMaxLength)
 		r.Len(title, 255)
 
 		book := &books.Book{
@@ -67,7 +68,7 @@ func TestValidateTitle(t *testing.T) {
 
 	t.Run("max length + 1 returns error", func(t *testing.T) {
 		r := require.New(t)
-		title := `title with 256 characters: baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
+		title := utils.StringWithLength(titleMaxLength + 1)
 		r.Len(title, 256)
 
 		book := &books.Book{
@@ -92,8 +93,9 @@ func TestValidateTitle(t *testing.T) {
 func TestValidateID(t *testing.T) {
 	t.Run("max length", func(t *testing.T) {
 		r := require.New(t)
+		maxLenStr := utils.StringWithLength(idMaxLength)
 		book := &books.Book{
-			Id: ulid.Make().String(),
+			Id: maxLenStr,
 		}
 		err := validateID(book)
 		r.NoError(err)
@@ -101,8 +103,9 @@ func TestValidateID(t *testing.T) {
 
 	t.Run("max length + 1 returns error", func(t *testing.T) {
 		r := require.New(t)
+		exceedMaxLen := utils.StringWithLength(idMaxLength + 1)
 		book := &books.Book{
-			Id: fmt.Sprint(ulid.Make().String(), "a"),
+			Id: exceedMaxLen,
 		}
 		err := validateID(book)
 		var invalidIDError *InvalidIDError
@@ -153,14 +156,59 @@ func TestValidate(t *testing.T) {
 
 	t.Run("validates ID", func(t *testing.T) {
 		r := require.New(t)
+		exceedMaxLen := utils.StringWithLength(idMaxLength + 1)
 		book := &books.Book{
 			Author:       `author1`,
 			Title:        `title1`,
-			Id:           `length one greater than max`,
+			Id:           exceedMaxLen,
 			CreationTime: timestamppb.New(time.Now()),
 		}
 		err := Validate(book)
 		var invalidIDError *InvalidIDError
 		r.ErrorAs(err, &invalidIDError)
+	})
+}
+
+func TestValidateListBooksRequest(t *testing.T) {
+	t.Run("valid lower boundary", func(t *testing.T) {
+		r := require.New(t)
+
+		req := &books.ListBooksRequest{
+			PageSize: 1,
+		}
+		err := ValidateListBooksRequest(req)
+		r.NoError(err)
+	})
+
+	t.Run("valid upper boundary", func(t *testing.T) {
+		r := require.New(t)
+
+		req := &books.ListBooksRequest{
+			PageSize: 50,
+		}
+		err := ValidateListBooksRequest(req)
+		r.NoError(err)
+	})
+
+	t.Run("invalid lower boundary", func(t *testing.T) {
+		r := require.New(t)
+
+		req := &books.ListBooksRequest{
+			PageSize: 0,
+		}
+		err := ValidateListBooksRequest(req)
+		var invalidPageSizeError *InvalidPageSizeError
+		r.ErrorAs(err, &invalidPageSizeError)
+	})
+
+	t.Run("invalid lower boundary", func(t *testing.T) {
+		r := require.New(t)
+
+		req := &books.ListBooksRequest{
+			PageSize: 51,
+		}
+		err := ValidateListBooksRequest(req)
+		var invalidPageSizeError *InvalidPageSizeError
+		r.ErrorAs(err, &invalidPageSizeError)
 	})
 }

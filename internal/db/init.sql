@@ -1,6 +1,6 @@
 CREATE TABLE books
 (
-    `id` VARCHAR(26),
+    `id` VARCHAR(30),
     `creation_time` DATETIME(6) DEFAULT NULL,
     `update_time` DATETIME(6) DEFAULT NULL,
     `title` VARCHAR(255) DEFAULT NULL,
