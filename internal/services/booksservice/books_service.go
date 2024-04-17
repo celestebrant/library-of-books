@@ -70,12 +70,14 @@ type BooksServer struct {
 }
 
 // CreateBook processes a CreateBookRequest to validate the input, create a new Book record from the request,
-// and insert it into the database. It returns a CreateBookResponse containing the created book or an error
-// if validation fails, or the database operation is unsuccessful.
+// and insert it into the database.
+//
+// Returns a CreateBookResponse containing the created book or an error if validation fails, or the database
+// operation is unsuccessful.
 func (s *BooksServer) CreateBook(
 	ctx context.Context, req *books.CreateBookRequest,
 ) (*books.CreateBookResponse, error) {
-	if err := Validate(req.Book); err != nil {
+	if err := ValidateCreateBookRequest(req); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
@@ -92,6 +94,10 @@ func (s *BooksServer) CreateBook(
 	}}, nil
 }
 
+// ListBooks retrieves a paginated list of books based on author and title filters.
+// It validates the request, fetches data from storage, and handles pagination via pageSize and nextPageToken.
+//
+// Returns an error if the request is invalid or if a storage error occurs.
 func (s *BooksServer) ListBooks(
 	ctx context.Context, req *books.ListBooksRequest,
 ) (*books.ListBooksResponse, error) {
@@ -99,7 +105,7 @@ func (s *BooksServer) ListBooks(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	res, err := s.MysqlStorage.ListBooks(ctx, req.Author, req.Title, req.PageSize, req.NextPageToken)
+	res, err := s.MysqlStorage.ListBooks(ctx, req.Author, req.Title, req.PageSize, req.PageToken)
 	if err != nil {
 		return nil, status.Error(codes.FailedPrecondition, err.Error())
 	}

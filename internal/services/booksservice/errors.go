@@ -1,41 +1,12 @@
 package booksservice
 
-type InvalidAuthorError struct {
-	Message string
+import "fmt"
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
 }
 
-func (e *InvalidAuthorError) Error() string {
-	return e.Message
-}
-
-type InvalidTitleError struct {
-	Message string
-}
-
-func (e *InvalidTitleError) Error() string {
-	return e.Message
-}
-
-type InvalidIDError struct {
-	Message string
-}
-
-func (e *InvalidIDError) Error() string {
-	return e.Message
-}
-
-type InvalidCreationTimeError struct {
-	Message string
-}
-
-func (e *InvalidCreationTimeError) Error() string {
-	return e.Message
-}
-
-type InvalidPageSizeError struct {
-	Message string
-}
-
-func (e *InvalidPageSizeError) Error() string {
-	return e.Message
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("validation error: field: %s, Message: %s", e.Field, e.Message)
 }

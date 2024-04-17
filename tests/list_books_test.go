@@ -19,6 +19,8 @@ func TestListBooks(t *testing.T) {
 	client, tearDown := setUpServerAndClient("127.0.0.1:8090")
 	defer tearDown()
 
+	t.Parallel()
+
 	t.Run("pagination", func(t *testing.T) {
 		r := require.New(t)
 
@@ -79,7 +81,7 @@ func TestListBooks(t *testing.T) {
 				Author:        filter,
 				Title:         filter,
 				PageSize:      pageSize,
-				NextPageToken: res1.NextPageToken,
+				PageToken: res1.NextPageToken,
 			},
 		)
 		r.NoError(err)
@@ -143,7 +145,7 @@ func TestListBooks(t *testing.T) {
 				Author:        filter,
 				Title:         filter,
 				PageSize:      pageSize,
-				NextPageToken: res1.NextPageToken,
+				PageToken: res1.NextPageToken,
 			},
 		)
 		r.NoError(err)

@@ -27,7 +27,7 @@ message ListBooksRequest {
     string author = 1;
     string title = 2;
     int64 page_size = 3;
-    string next_page_token = 4;
+    string page_token = 4;
 }
 
 message ListBooksResponse {
